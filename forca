@@ -10,7 +10,6 @@ palavrasecreta = ''
 letras_acertada = [0] * 26
 palavras = [''] * NUM_PALAVRAS
 dicas = [''] * NUM_PALAVRAS
-dica = [''] * NUM_PALAVRAS
 
 def contar_palavras():
     try:
