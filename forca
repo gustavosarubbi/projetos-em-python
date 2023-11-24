@@ -1,165 +1,85 @@
 import random
 
 MAX_TENTATIVAS = 5
-NUM_PALAVRAS = 100
+BANCO_DE_DADOS = "banco_dados.txt"
 
-achou = 0
-tentativas = 0
-chutes = [''] * 24
-palavrasecreta = ''
-letras_acertada = [0] * 26
-palavras = [''] * NUM_PALAVRAS
-dicas = [''] * NUM_PALAVRAS
-
-def contar_palavras():
+def carregar_palavras():
     try:
-        with open("banco_dados", "r") as arquivo:
-            total_palavras = 0
-            for linha in arquivo:
-                palavra, dica = linha.split()
-                palavras[total_palavras] = palavra
-                dicas[total_palavras] = dica
-                total_palavras += 1
-        return total_palavras
+        with open(BANCO_DE_DADOS, "r") as arquivo:
+            palavras = [linha.strip().split() for linha in arquivo]
+        return palavras
     except FileNotFoundError:
         print("Sem Banco de Dados!")
         exit(1)
 
-def escolher_palavra():
-    total_palavras = contar_palavras()
-    if total_palavras == 0:
-        print("Sem palavras no banco de dados. Adicione palavras antes de jogar.")
-        exit(1)
+def escolher_palavra(palavras):
+    return random.choice(palavras)
 
-    randomico = random.randint(0, total_palavras - 1)
+def inicializar_letras_acertadas(palavra):
+    return [False] * len(palavra)
 
-    with open("banco_dados", "r") as arquivo:
-        for i in range(randomico + 1):
-            palavrasecreta, dica = arquivo.readline().split()
-
-def verificar_letra():
-    for letra in palavrasecreta:
-        if letras_acertada[ord(letra) - ord('A')] == 1:
-            print(f"{letra} ", end="")
+def exibir_palavra_mascarada(palavra, letras_acertadas):
+    for i, letra_acertada in enumerate(letras_acertadas):
+        if letra_acertada:
+            print(palavra[i], end=" ")
         else:
-            print("_ ", end="")
+            print("_", end=" ")
     print()
 
-def inicializar_letra_acertada():
-    for i in range(26):
-        letras_acertada[i] = 0
+def desenhar_forca(tentativas):
+    desenhos_forca = [
+        "  ___       ",
+        " |/      |  ",
+        " |      ( ) " if tentativas > 0 else " |",
+        " |      /|\\ " if tentativas > 2 else " |",
+        " |       |  " if tentativas > 1 else " |",
+        " |      / \\ " if tentativas > 4 else " |",
+        " |          ",
+        "|__         "
+    ]
 
-def desenhar_forca():
-    erros = tentativas
-    print("  ___       ")
-    print(" |/      |      ")
-    print(" |      {}{}{}  ".format('(', '_' if erros >= 1 else ' ', ')' if erros >= 1 else ' '))
-    print(" |      {} {}{}  ".format('\\' if erros >= 3 else ' ', '|' if erros >= 2 else ' ', '/' if erros >= 4 else ' '))
-    print(" |       {}     ".format('|' if erros >= 2 else ' '))
-    print(" |      {} {}   ".format('/' if erros >= 5 else ' ', '\\' if erros >= 5 else ' '))
-    print(" |              ")
-    print("|__           \n")
+    for linha in desenhos_forca:
+        print(linha)
 
-def chutar_letra():
-    global tentativas
-    chute = input("A dica: {}\nChute uma letra: ".format(dicas)).upper()
-
-    letra_repetida = chute in chutes[:tentativas]
-
-    if letra_repetida:
-        print("\nLetra já chutada! Tente novamente\n\n")
-    else:
-        achou = False
-        for i, letra in enumerate(palavrasecreta):
-            if letra == chute:
-                letras_acertada[ord(letra) - ord('A')] = 1
-                achou = True
-
-        if achou:
-            print("\nVocê acertou a letra {}\n\n".format(chute))
-        else:
-            chutes[tentativas] = chute
-            tentativas += 1
-            print("\nLetra {} não encontrada na palavra.\n\n".format(chute))
-
-def adicionar_palavra():
-    try:
-        with open("banco_dados", "a") as arquivo:
-            palavra = input("A palavra para ser adicionada: ").upper()
-            dica = input("Dica da palavra adicionada: ").upper()
-            arquivo.write("{} {}\n".format(palavra, dica))
-        print("Palavra adicionada e dica!")
-    except FileNotFoundError:
-        print("Sem Banco de Dados!")
-        exit(1)
+def jogar_novamente():
+    resposta = input("\nDeseja jogar novamente? (S/N) ").upper()
+    return resposta == 'S'
 
 def main():
-    global tentativas
-    opcao = 0
-    while opcao != 1:
-        print("-------------------")
-        print(":  JOGO DA FORCA  :")
-        print("-------------------")
-        print("1. Jogar")
-        print("2. Adicionar Palavras")
-        opcao = int(input("Escolha uma opção: "))
-        if opcao == 1:
-            contar_palavras()
-        elif opcao == 2:
-            adicionar_palavra()
-        else:
-            print("Opção inválida!")
-            return 1
+    print("-------------------")
+    print(":  JOGO DA FORCA  :")
+    print("-------------------")
 
     while True:
-        escolher_palavra()
-        inicializar_letra_acertada()
+        palavras = carregar_palavras()
+        palavra_secreta, dica = escolher_palavra(palavras)
+        letras_acertadas = inicializar_letras_acertadas(palavra_secreta)
+        tentativas = 0
 
         while True:
-            desenhar_forca()
-            verificar_letra()
-            chutar_letra()
+            exibir_palavra_mascarada(palavra_secreta, letras_acertadas)
+            desenhar_forca(tentativas)
 
-            letras_acertadas = sum(letras_acertada)
-            if letras_acertadas == len(palavrasecreta):
-                print("       _____      ")
-                print("      '.=====.'     ")
-                print("      .-\\:      /-.    ")
-                print("     | (|:.     |) |    ")
-                print("      '-|:.     |-'     ")
-                print("        \\::.    /      ")
-                print("         '::. .'        ")
-                print("           ) (          ")
-                print("         .' '.        ")
-                print("        '-------'       \n")
-                print("  Parabéns, você ganhou! ")
+            chute = input("Dica: {}\nChute uma letra: ".format(dica)).upper()
+
+            if chute in palavra_secreta:
+                for i, letra in enumerate(palavra_secreta):
+                    if letra == chute:
+                        letras_acertadas[i] = True
+            else:
+                tentativas += 1
+
+            letras_acertadas_completas = all(letras_acertadas)
+            if letras_acertadas_completas:
+                print("\nParabéns, você ganhou!")
                 break
 
-            if tentativas > MAX_TENTATIVAS:
-                print("    _____         ")
-                print("   /               \\       ")
-                print("  /                 \\      ")
-                print("//                   \\/\\  ")
-                print("\\|   XXXX     XXXX   | /   ")
-                print(" |   XXXX     XXXX   |/     ")
-                print(" |   XXX       XXX   |      ")
-                print(" |                   |      ")
-                print(" \\__      XXX      __/     ")
-                print("   |\\     XXX     /|       ")
-                print("   | |           | |        ")
-                print("   | I I I I I I I |        ")
-                print("   |  I I I I I I  |        ")
-                print("   \\_             _/       ")
-                print("     \\_         _/         ")
-                print("       \\___/           \n")
-                print("     Você perdeu!         ")
+            if tentativas >= MAX_TENTATIVAS:
+                print("\nVocê perdeu! A palavra era: {}".format(palavra_secreta))
                 break
 
-        jogar_novamente = input("\nDeseja jogar novamente? (S/N) ").upper()
-        if jogar_novamente == 'N':
+        if not jogar_novamente():
             break
-        else:
-            tentativas = 0
 
 if __name__ == "__main__":
     main()
