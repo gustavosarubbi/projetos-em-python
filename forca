@@ -53,16 +53,16 @@ def desenhar_forca():
     erros = tentativas
     print("  ___       ")
     print(" |/      |      ")
-    print(f" |      {'(' if erros >= 1 else ' '}{'_' if erros >= 1 else ' '}{')' if erros >= 1 else ' '}  ")
-    print(f" |      {'\\' if erros >= 3 else ' '}{ '|' if erros >= 2 else ' '}{ '/' if erros >= 4 else ' '}  ")
-    print(f" |       {'|' if erros >= 2 else ' '}     ")
-    print(f" |      {'/' if erros >= 5 else ' '} {'\\' if erros >= 5 else ' '}  ")
+    print(" |      {}{}{}  ".format('(', '_' if erros >= 1 else ' ', ')' if erros >= 1 else ' '))
+    print(" |      {} {}{}  ".format('\\' if erros >= 3 else ' ', '|' if erros >= 2 else ' ', '/' if erros >= 4 else ' '))
+    print(" |       {}     ".format('|' if erros >= 2 else ' '))
+    print(" |      {} {}   ".format('/' if erros >= 5 else ' ', '\\' if erros >= 5 else ' '))
     print(" |              ")
     print("|__           \n")
 
 def chutar_letra():
     global tentativas
-    chute = input(f"A dica: {dicas}\nChute uma letra: ").upper()
+    chute = input("A dica: {}\nChute uma letra: ".format(dicas)).upper()
 
     letra_repetida = chute in chutes[:tentativas]
 
@@ -76,18 +76,18 @@ def chutar_letra():
                 achou = True
 
         if achou:
-            print(f"\nVocê acertou a letra {chute}\n\n")
+            print("\nVocê acertou a letra {}\n\n".format(chute))
         else:
             chutes[tentativas] = chute
             tentativas += 1
-            print(f"\nLetra {chute} não encontrada na palavra.\n\n")
+            print("\nLetra {} não encontrada na palavra.\n\n".format(chute))
 
 def adicionar_palavra():
     try:
         with open("banco_dados", "a") as arquivo:
             palavra = input("A palavra para ser adicionada: ").upper()
             dica = input("Dica da palavra adicionada: ").upper()
-            arquivo.write(f"{palavra} {dica}\n")
+            arquivo.write("{} {}\n".format(palavra, dica))
         print("Palavra adicionada e dica!")
     except FileNotFoundError:
         print("Sem Banco de Dados!")
