@@ -1,85 +1,40 @@
 import random
 
-MAX_TENTATIVAS = 5
-BANCO_DE_DADOS = "banco_dados.txt"
-
-def carregar_palavras():
-    try:
-        with open(BANCO_DE_DADOS, "r") as arquivo:
-            palavras = [linha.strip().split() for linha in arquivo]
-        return palavras
-    except FileNotFoundError:
-        print("Sem Banco de Dados!")
-        exit(1)
-
-def escolher_palavra(palavras):
-    return random.choice(palavras)
-
-def inicializar_letras_acertadas(palavra):
-    return [False] * len(palavra)
-
-def exibir_palavra_mascarada(palavra, letras_acertadas):
-    for i, letra_acertada in enumerate(letras_acertadas):
-        if letra_acertada:
-            print(palavra[i], end=" ")
+def salvar_palavras():
+    nova_palavra = input("Digite a palavra nova:").upper()
+    dica = input("Digite a dica:").upper()
+    with open("banco_dados.txt","a") as arquivo:
+        arquivo.write(f"{nova_palavra} {dica}\n")
+        
+def escolher_palavras():
+    with open("banco_dados.txt","r") as arquivo:
+        linhas = arquivo.readlines()
+        if linhas:
+            linhas_aleatoria = random.choice(linhas)
+            palavra, dica = linhas_aleatoria.strip().split()
+            return palavra, dica
         else:
-            print("_", end=" ")
-    print()
-
-def desenhar_forca(tentativas):
-    desenhos_forca = [
-        "  ___       ",
-        " |/      |  ",
-        " |      ( ) " if tentativas > 0 else " |",
-        " |      /|\\ " if tentativas > 2 else " |",
-        " |       |  " if tentativas > 1 else " |",
-        " |      / \\ " if tentativas > 4 else " |",
-        " |          ",
-        "|__         "
-    ]
-
-    for linha in desenhos_forca:
-        print(linha)
-
-def jogar_novamente():
-    resposta = input("\nDeseja jogar novamente? (S/N) ").upper()
-    return resposta == 'S'
-
-def main():
-    print("-------------------")
-    print(":  JOGO DA FORCA  :")
-    print("-------------------")
-
-    while True:
-        palavras = carregar_palavras()
-        palavra_secreta, dica = escolher_palavra(palavras)
-        letras_acertadas = inicializar_letras_acertadas(palavra_secreta)
-        tentativas = 0
-
-        while True:
-            exibir_palavra_mascarada(palavra_secreta, letras_acertadas)
-            desenhar_forca(tentativas)
-
-            chute = input("Dica: {}\nChute uma letra: ".format(dica)).upper()
-
-            if chute in palavra_secreta:
-                for i, letra in enumerate(palavra_secreta):
-                    if letra == chute:
-                        letras_acertadas[i] = True
-            else:
-                tentativas += 1
-
-            letras_acertadas_completas = all(letras_acertadas)
-            if letras_acertadas_completas:
-                print("\nParabéns, você ganhou!")
-                break
-
-            if tentativas >= MAX_TENTATIVAS:
-                print("\nVocê perdeu! A palavra era: {}".format(palavra_secreta))
-                break
-
-        if not jogar_novamente():
-            break
-
-if __name__ == "__main__":
-    main()
+            return None
+    
+palavra_secreta, dica = escolher_palavras()
+letras_acertadas = [False] *len(palavra_secreta)
+tentativas = 0
+def chute():
+    
+    for(i, letra in enumerate(palavra_secreta)):
+        if palavra_secreta:
+            print(palavra_secreta[i],end =' ')
+        else:
+            print("_",end=' ')
+    
+    chute = input("Chute uma letra:").upper()
+    
+    if(chute in palavra_secreta):
+        for i, letra in enumerate(palavra_secreta):
+            if(letra == chute):
+                letras_acertadas[i] = True
+                print("Acertou a letra!")
+    else:
+        tentativas+= 1
+        print("Não acertou!")
+        
