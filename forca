@@ -1,40 +1,45 @@
 import random
 
 def salvar_palavras():
-    nova_palavra = input("Digite a palavra nova:").upper()
-    dica = input("Digite a dica:").upper()
-    with open("banco_dados.txt","a") as arquivo:
-        arquivo.write(f"{nova_palavra} {dica}\n")
+    palavra_nova = input("Digite a palavra nova: ").upper()
+    dica = input("Digite a dica da palavra: ").upper()
+    with open("banco_dados","a") as arquivo:
+        arquivo.write(f"{palavra_nova} {dica}\n")
         
 def escolher_palavras():
-    with open("banco_dados.txt","r") as arquivo:
+    with open("banco_dados","r") as arquivo:
         linhas = arquivo.readlines()
         if linhas:
             linhas_aleatoria = random.choice(linhas)
-            palavra, dica = linhas_aleatoria.strip().split()
-            return palavra, dica
+            palavra_secreta, dica = linhas_aleatoria.strip().split()
+            return palavra_secreta, dica
         else:
             return None
-    
+
 palavra_secreta, dica = escolher_palavras()
-letras_acertadas = [False] *len(palavra_secreta)
+letra_acertadas = [False] * len(palavra_secreta)
 tentativas = 0
-def chute():
+def forca():
     
-    for(i, letra in enumerate(palavra_secreta)):
-        if palavra_secreta:
-            print(palavra_secreta[i],end =' ')
+    for i, letra in enumerate(palavra_secreta):
+        if(letra == letra_acertadas[i]):
+            print(letra, end=' ')
         else:
             print("_",end=' ')
     
-    chute = input("Chute uma letra:").upper()
+    print(f"A dica é: {dica}")
+    chute = input("Chute uma palavra: ").upper().strip()
     
-    if(chute in palavra_secreta):
-        for i, letra in enumerate(palavra_secreta):
-            if(letra == chute):
-                letras_acertadas[i] = True
-                print("Acertou a letra!")
-    else:
-        tentativas+= 1
-        print("Não acertou!")
-        
+    for chute in palavra_secreta:
+        if letra == chute:
+            letra_acertadas[i] = True
+            print("Você acertou uma letra!")
+        else:
+            print("Você errou a letra!")
+            break
+
+
+while True:
+    forca()
+
+
