@@ -15,31 +15,35 @@ def escolher_palavras():
             return palavra_secreta, dica
         else:
             return None
-
+            
 palavra_secreta, dica = escolher_palavras()
 letra_acertadas = [False] * len(palavra_secreta)
 tentativas = 0
-def forca():
+
+def desenho_forca():
     
     for i, letra in enumerate(palavra_secreta):
-        if(letra == letra_acertadas[i]):
+        if letra_acertadas[i]:
             print(letra, end=' ')
         else:
             print("_",end=' ')
     
+def forca():
+    acertou = False  
     print(f"A dica é: {dica}")
     chute = input("Chute uma palavra: ").upper().strip()
     
-    for chute in palavra_secreta:
+    for i, letra in enumerate(palavra_secreta):
         if letra == chute:
             letra_acertadas[i] = True
-            print("Você acertou uma letra!")
-        else:
-            print("Você errou a letra!")
-            break
-
-
+            acertou = True
+            
+    if acertou:
+        print(f"Você acertou a letra {letra}")
+    
+    if not acertou:
+        print("Erroooou!")
+        tentativas += 1
+    
 while True:
     forca()
-
-
